@@ -13,3 +13,7 @@ server:
 # Run (with cargo) roxy-cli
 client:
 	echo "Roxy-cli is yet not implemented"
+
+# Update Cargo.nix
+update-nix:
+	nix run github:cargo2nix/cargo2nix
