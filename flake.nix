@@ -37,7 +37,7 @@
               };
             })
           ];
-          extraRustComponents = ["clippy" "rust-analyzer"];
+          extraRustComponents = ["clippy" "rust-analyzer" "rustfmt"];
         };
 
       in rec {
@@ -49,8 +49,26 @@
           # nix build .#packages.x86_64-linux.rust-bitcoin-proxy
           roxy = (rustPkgs.workspace.roxy {});
           # nix build
-          default = packages.roxy; # rec
+          default = packages.roxy;
         };
+
+        apps = {
+          inherit system;
+          roxyd = {
+            type = "app";
+            program ="${self.packages.${system}.roxy}/bin/roxyd";
+          };
+          roxy-cli = {
+            type = "app";
+            program ="${self.packages.${system}.roxy}/bin/roxy-cli";
+          };
+        };
+        
+        devShells = pkgs.mkShell {
+          packages = with pkgs; [ 
+            just
+        ];
+      };
       }
     );
 }
