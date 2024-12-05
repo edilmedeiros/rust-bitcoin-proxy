@@ -67,8 +67,8 @@
         devShells = pkgs.mkShell {
           packages = with pkgs; [ 
             just
-        ];
-      };
+          ];
+        };
       }
     );
 }
