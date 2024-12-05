@@ -1,6 +1,6 @@
-use serde::{Serialize, Deserialize, de::DeserializeOwned};
-use serde_json::value::RawValue;
 use crate::error::*;
+use serde::{de::DeserializeOwned, Deserialize, Serialize};
+use serde_json::value::RawValue;
 
 /// A JSONRPC request object.
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -34,7 +34,7 @@ impl Response {
     /// Returns the result, checking for errors.
     pub fn result<T>(&self) -> Result<T, Error>
     where
-        T: DeserializeOwned
+        T: DeserializeOwned,
     {
         if let Some(ref e) = self.error {
             return Err(Error::Rpc(e.clone()));
@@ -57,7 +57,9 @@ impl Response {
     }
 
     /// Check if the result field is empty
-    pub fn is_none(&self) -> bool { self.result.is_none() }
+    pub fn is_none(&self) -> bool {
+        self.result.is_none()
+    }
 }
 
 /// Convert an argument into a boxed [`serde_json::value::RawValue`].
@@ -86,9 +88,12 @@ mod tests {
 
     #[test]
     fn test_getblocktemplate() {
-        let params = Some(serde_json::value::RawValue::from_string(
-            "[{\"rules\":[\"segwit\",\"signet\"]}]".to_owned())
-                          .unwrap());
+        let params = Some(
+            serde_json::value::RawValue::from_string(
+                "[{\"rules\":[\"segwit\",\"signet\"]}]".to_owned(),
+            )
+            .unwrap(),
+        );
         let request = Request {
             jsonrpc: "2.0",
             method: "getblocktemplate",
@@ -105,9 +110,7 @@ mod tests {
     fn response_is_none() {
         let r0 = Response {
             jsonrpc: Some(String::from("2.0")),
-            result: Some(RawValue::from_string(
-                serde_json::to_string("signet").unwrap())
-                         .unwrap()),
+            result: Some(RawValue::from_string(serde_json::to_string("signet").unwrap()).unwrap()),
             error: None,
             id: Some(From::from(0)),
         };
@@ -128,9 +131,7 @@ mod tests {
         let obj = vec!["signet", "miner"];
         let r2 = Response {
             jsonrpc: Some(String::from("2.0")),
-            result: Some(RawValue::from_string(
-                serde_json::to_string(&obj).unwrap())
-                         .unwrap()),
+            result: Some(RawValue::from_string(serde_json::to_string(&obj).unwrap()).unwrap()),
             error: None,
             id: Some(From::from(2)),
         };
@@ -141,13 +142,11 @@ mod tests {
         let r3 = Response {
             jsonrpc: Some(String::from("2.0")),
             result: None,
-            error: Some(
-                RpcError {
-                    code: -32700,
-                    message: "Parse error".to_owned(),
-                    data: None,
-                }
-            ),
+            error: Some(RpcError {
+                code: -32700,
+                message: "Parse error".to_owned(),
+                data: None,
+            }),
             id: Some(From::from(2)),
         };
         assert!(r3.clone().get_error().is_err());
@@ -205,6 +204,11 @@ mod tests {
         struct Test {
             v: String,
         }
-        test_arg!(Test { v: String::from("test") }, Test);
+        test_arg!(
+            Test {
+                v: String::from("test")
+            },
+            Test
+        );
     }
 }

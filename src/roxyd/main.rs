@@ -21,12 +21,9 @@ async fn foo() -> impl Responder {
     // args[2]: rpc password
     // TODO: proper user input
 
-    let client = HttpClient::new(
-        "http://127.0.0.1:38332", "foo", "bar").unwrap();
+    let client = HttpClient::new("http://127.0.0.1:38332", "foo", "bar").unwrap();
 
-    let response = client.call_method(
-        "baz",
-        None).await.unwrap();
+    let response = client.call_method("baz", None).await.unwrap();
 
     println!("{}", serde_json::to_string(&response.clone()).unwrap());
 
@@ -35,17 +32,13 @@ async fn foo() -> impl Responder {
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
-
     // TODO: share resources (DB, username, password) with services
     // let args: Vec<String> = env::args().collect();
 
-    let _ = HttpServer::new(|| {
-        App::new()
-            .service(foo)
-    })
-    .bind(("127.0.0.1", 8080))?
-    .run()
-    .await;
+    let _ = HttpServer::new(|| App::new().service(foo))
+        .bind(("127.0.0.1", 8080))?
+        .run()
+        .await;
 
     Ok(())
 }
