@@ -4,7 +4,9 @@ version = "0.1.0"
 edition = "2021"
 
 [[bin]]
-name = "roxy"
+path = "src/roxyd/main.rs"
+name = "roxyd"
+
 
 [dependencies]
 actix-web = "4.9.0"
