@@ -26,6 +26,18 @@
         rustPkgs = pkgs.rustBuilder.makePackageSet {
           rustVersion = "1.75.0";
           packageFun = import ./Cargo.nix;
+          packageOverrides = pkgs: pkgs.rustBuilder.overrides.all ++ [    
+            (pkgs.rustBuilder.rustLib.makeOverride {
+              name = "openssl-sys";
+              overrideAttrs = drv: {
+                propagatedBuildInputs = drv.propagatedBuildInputs or [ ] ++ [
+                  pkgs.openssl
+                  pkgs.pkg-config
+                ];
+              };
+            })
+          ];
+          extraRustComponents = ["clippy" "rust-analyzer"];
         };
 
       in rec {
@@ -35,9 +47,9 @@
         packages = {
           # nix build .#rust-bitcoin-proxy
           # nix build .#packages.x86_64-linux.rust-bitcoin-proxy
-          rust-bitcoin-proxy = (rustPkgs.workspace.rust-bitcoin-proxy {});
+          roxy = (rustPkgs.workspace.roxy {});
           # nix build
-          default = packages.rust-bitcoin-proxy; # rec
+          default = packages.roxy; # rec
         };
       }
     );
