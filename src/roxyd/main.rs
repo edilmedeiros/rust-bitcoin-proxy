@@ -4,14 +4,6 @@ use roxy::error::*;
 use actix_web::{post, App, HttpResponse, HttpServer, Responder};
 use roxy::http_client::HttpClient;
 
-// Miner pipeline:
-// $CLI -signet getblocktemplate '{"rules": ["signet","segwit"]}' |
-//   $MINER --cli="$CLI" genpsbt --address="$ADDR" |
-//   $CLI -signet -stdin walletprocesspsbt |
-//   jq -r .psbt |
-//   $MINER --cli="$CLI" solvepsbt --grind-cmd="$GRIND" |
-//   $CLI -signet -stdin submitblock
-
 // TODO: share client between services
 #[post("/proxy")]
 async fn foo() -> impl Responder {
