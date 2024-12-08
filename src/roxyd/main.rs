@@ -1,7 +1,7 @@
 use roxy::error::*;
 // use serde_json::value::RawValue;
 // use std::env;
-use actix_web::{get, App, HttpResponse, HttpServer, Responder};
+use actix_web::{post, App, HttpResponse, HttpServer, Responder};
 use roxy::http_client::HttpClient;
 
 // Miner pipeline:
@@ -13,7 +13,7 @@ use roxy::http_client::HttpClient;
 //   $CLI -signet -stdin submitblock
 
 // TODO: share client between services
-#[get("/foo")]
+#[post("/proxy")]
 async fn foo() -> impl Responder {
     // TODO: add proper error handling
 
@@ -21,8 +21,16 @@ async fn foo() -> impl Responder {
     // args[2]: rpc password
     // TODO: proper user input
 
-    let client = HttpClient::new("http://127.0.0.1:38332", "foo", "bar").unwrap();
+    // Steps
+    // We need to get the body of the request (comes from roxy-cli)
+    // Consult the read payload and do some verification
+    // Use username and password from file (read the file in main)
+    // Use a client for bitcoind (spawned in main)
+    // Call method from the read body of the request (comes from roxy-cli)
+    // Get response from bitcoind
+    // Extract JSON and pipe it back to roxy-cli
 
+    let client = HttpClient::new("http://127.0.0.1:38332", "foo", "bar").unwrap();
     let response = client.call_method("baz", None).await.unwrap();
 
     println!("{}", serde_json::to_string(&response.clone()).unwrap());
