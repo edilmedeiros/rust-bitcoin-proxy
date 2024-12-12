@@ -4,14 +4,14 @@ use serde_json::value::RawValue;
 
 /// A JSONRPC request object.
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct Request<'a> {
+pub struct RpcRequest {
     /// jsonrpc field, MUST be "2.0".
-    pub jsonrpc: &'a str,
+    pub jsonrpc: String,
     /// The name of the RPC call.
-    pub method: &'a str,
+    pub method: String,
     /// Parameters to the RPC call.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub params: Option<&'a RawValue>,
+    pub params: Option<Box<RawValue>>,
     /// Identifier for this request, which should appear in the response.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<usize>,
@@ -19,7 +19,7 @@ pub struct Request<'a> {
 
 /// A JSONRPC response object.
 #[derive(Debug, Clone, Deserialize, Serialize)]
-pub struct Response {
+pub struct RpcResponse {
     /// jsonrpc field, MUST be "2.0".
     pub jsonrpc: Option<String>,
     /// A result if there is one, or [`None`].
@@ -30,7 +30,7 @@ pub struct Response {
     pub id: Option<serde_json::Value>,
 }
 
-impl Response {
+impl RpcResponse {
     /// Returns the result, checking for errors.
     pub fn result<T>(&self) -> Result<T, Error>
     where
@@ -94,10 +94,10 @@ mod tests {
             )
             .unwrap(),
         );
-        let request = Request {
-            jsonrpc: "2.0",
-            method: "getblocktemplate",
-            params: params.as_deref(),
+        let request = RpcRequest {
+            jsonrpc: "2.0".to_owned(),
+            method: "getblocktemplate".to_owned(),
+            params,
             id: Some(0),
         };
         assert_eq!(
@@ -108,14 +108,14 @@ mod tests {
 
     #[test]
     fn response_is_none() {
-        let r0 = Response {
+        let r0 = RpcResponse {
             jsonrpc: Some(String::from("2.0")),
             result: Some(RawValue::from_string(serde_json::to_string("signet").unwrap()).unwrap()),
             error: None,
             id: Some(From::from(0)),
         };
 
-        let r1 = Response {
+        let r1 = RpcResponse {
             jsonrpc: Some(String::from("2.0")),
             result: None,
             error: None,
@@ -129,7 +129,7 @@ mod tests {
     #[test]
     fn response_result() {
         let obj = vec!["signet", "miner"];
-        let r2 = Response {
+        let r2 = RpcResponse {
             jsonrpc: Some(String::from("2.0")),
             result: Some(RawValue::from_string(serde_json::to_string(&obj).unwrap()).unwrap()),
             error: None,
@@ -139,7 +139,7 @@ mod tests {
         assert!(r2.get_error().is_ok());
         assert_eq!(obj, recovered);
 
-        let r3 = Response {
+        let r3 = RpcResponse {
             jsonrpc: Some(String::from("2.0")),
             result: None,
             error: Some(RpcError {
@@ -156,7 +156,7 @@ mod tests {
     #[test]
     fn null_result() {
         let s = r#"{"jsonrpc":"2.0","result":null,"error":null,"id":"test"}"#;
-        let response: Response = serde_json::from_str(s).unwrap();
+        let response: RpcResponse = serde_json::from_str(s).unwrap();
         let recovered1: Result<(), _> = response.result();
         let recovered2: Result<(), _> = response.result();
         assert!(recovered1.is_ok());
@@ -178,7 +178,7 @@ mod tests {
             {"jsonrpc": "2.0", "error": {"code": -32601, "message": "Method not found"}, "id": "5"},
             {"jsonrpc": "2.0", "result": ["hello", 5], "id": "9"}
         ]"#;
-        let batch_response: Vec<Response> = serde_json::from_str(s).unwrap();
+        let batch_response: Vec<RpcResponse> = serde_json::from_str(s).unwrap();
         assert_eq!(batch_response.len(), 5);
     }
 
