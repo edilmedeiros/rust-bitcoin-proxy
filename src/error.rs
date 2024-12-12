@@ -1,4 +1,9 @@
+use actix_web::body::BoxBody;
+use actix_web::error::ResponseError;
+use actix_web::http::StatusCode;
+use actix_web::HttpResponse;
 use serde::{Deserialize, Serialize};
+use std::fmt;
 
 #[derive(Debug)]
 pub enum Error {
@@ -29,6 +34,21 @@ pub struct RpcError {
     pub message: String,
     /// Additional data specific to the error
     pub data: Option<Box<serde_json::value::RawValue>>,
+}
+
+impl fmt::Display for Error {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{:?}", self)
+    }
+}
+
+impl ResponseError for Error {
+    fn status_code(&self) -> StatusCode {
+        StatusCode::INTERNAL_SERVER_ERROR
+    }
+    fn error_response(&self) -> HttpResponse<BoxBody> {
+        HttpResponse::InternalServerError().into()
+    }
 }
 
 impl From<std::io::Error> for Error {
