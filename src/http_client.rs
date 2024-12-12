@@ -58,8 +58,7 @@ impl HttpClient {
                     payload
                         .id
                         .as_ref()
-                        .map(|value| value.as_u64().map(|v| v as usize))
-                        .flatten(),
+                        .and_then(|value| value.as_u64().map(|v| v as usize)),
                     payload.jsonrpc.as_ref(),
                 ) {
                     // Before bitcoind v28.0, this match will probably fail.
