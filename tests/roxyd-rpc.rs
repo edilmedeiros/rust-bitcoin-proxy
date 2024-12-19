@@ -1,16 +1,25 @@
 use node::BitcoinD;
 use roxy::http_client;
-use roxy::json_rpc::Response;
+
+pub fn spawn_bitcoind() -> BitcoinD {
+    if std::env::var_os("BITCOIND_SKIP_DOWNLOAD").is_some() {
+        BitcoinD::new(node::exe_path().unwrap()).unwrap()
+    } else {
+        BitcoinD::from_downloaded().unwrap()
+    }
+}
 
 #[tokio::test]
 async fn test_get_blockchain_info() {
     // Call with `cargo test -- --nocapture` to see the print outputs.
-    let bitcoind = BitcoinD::from_downloaded().unwrap();
+    // let bitcoind = BitcoinD::from_downloaded().unwrap();
+    let bitcoind = spawn_bitcoind();
+    assert_eq!(0, bitcoind.client.get_blockchain_info().unwrap().blocks);
+
     let rpc_url = bitcoind.rpc_url();
     let cookie = std::fs::read_to_string(&bitcoind.params.cookie_file).unwrap();
     let (user, pass) = cookie.split_once(':').unwrap();
 
-    assert_eq!(0, bitcoind.client.get_blockchain_info().unwrap().blocks);
     println!("rpc url: {rpc_url}");
     println!("user: {user}");
     println!("pass: {pass}");
@@ -19,7 +28,10 @@ async fn test_get_blockchain_info() {
     println!("{:?}", bitcoind.params);
 
     let rpc_client = http_client::HttpClient::new(&rpc_url, user, pass).unwrap();
-    let response = rpc_client.call_method("getblockchaininfo", None).await.unwrap();
+    let response = rpc_client
+        .call_method("getblockchaininfo", None)
+        .await
+        .unwrap();
     println!("{:?}", response);
 
     let response_json = response.result.unwrap();
