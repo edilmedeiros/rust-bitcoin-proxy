@@ -33,12 +33,23 @@
                 propagatedBuildInputs = drv.propagatedBuildInputs or [ ] ++ [
                   pkgs.openssl
                   pkgs.pkg-config
+                  pkgs.bitcoin
                 ];
               };
             })
           ];
           extraRustComponents = ["clippy" "rust-analyzer" "rustfmt"];
         };
+
+        workspaceShell = (rustPkgs.workspaceShell {
+          packages = with pkgs; [ 
+            just
+          ];
+          shellHook = ''
+             echo -e "\\033[1;31m"Skipping bitcoind download..."\\033[0;m"
+             export BITCOIND_SKIP_DOWNLOAD=true
+          '';
+        });
 
       in rec {
         # this is the output (recursive) set (expressed for each system)
@@ -64,11 +75,7 @@
           };
         };
         
-        devShells = pkgs.mkShell {
-          packages = with pkgs; [ 
-            just
-          ];
-        };
+        devShell = workspaceShell;       
       }
     );
 }
