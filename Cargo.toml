@@ -21,4 +21,4 @@ tokio = { version = "1.41.1", features = ["full"] }
 # Which and Home crates are indirect dependencies for corepc-node
 which = "=4.2.5"
 home = "=0.5.9"
-node = { package = "corepc-node", version = "0.4.0", features = ["26_0"] }
+node = { package = "corepc-node", version = "0.4.0", features = ["28_0"] }
