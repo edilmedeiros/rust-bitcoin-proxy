@@ -37,13 +37,14 @@ async fn main() -> Result<(), Error> {
 
     let client = Arc::new(HttpClient::new("http://127.0.0.1:38332", "foo", "bar").unwrap());
 
-    let _ = HttpServer::new(move ||
-                            App::new()
-                            .app_data(web::Data::new(client.clone()))
-                            .service(proxy))
-        .bind(("127.0.0.1", 8080))?
-        .run()
-        .await;
+    let _ = HttpServer::new(move || {
+        App::new()
+            .app_data(web::Data::new(client.clone()))
+            .service(proxy)
+    })
+    .bind(("127.0.0.1", 8080))?
+    .run()
+    .await;
 
     Ok(())
 }
