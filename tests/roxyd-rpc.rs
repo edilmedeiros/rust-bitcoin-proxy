@@ -1,5 +1,5 @@
 use node::BitcoinD;
-use roxy::http_client;
+use roxy::json_rpc_client;
 
 pub fn spawn_bitcoind() -> BitcoinD {
     if std::env::var_os("BITCOIND_SKIP_DOWNLOAD").is_some() {
@@ -27,7 +27,7 @@ async fn test_get_blockchain_info() {
     println!("{:?}", bitcoind.client);
     println!("{:?}", bitcoind.params);
 
-    let rpc_client = http_client::HttpClient::new(&rpc_url, user, pass).unwrap();
+    let rpc_client = json_rpc_client::BitcoindClient::new(&rpc_url, user, pass).unwrap();
     let response = rpc_client
         .call_method("getblockchaininfo", None)
         .await
