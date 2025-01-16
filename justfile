@@ -16,4 +16,4 @@ client:
 
 # Update Cargo.nix
 update-nix:
-	nix run github:cargo2nix/cargo2nix
+	nix run github:cargo2nix/cargo2nix && rm -rf .direnv && direnv allow
