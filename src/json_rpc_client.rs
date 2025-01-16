@@ -3,48 +3,52 @@ use serde_json::value::RawValue;
 use std::sync::atomic;
 
 use crate::error::*;
-use crate::json_rpc::*;
+use crate::json_rpc_types::*;
 
 #[derive(Debug)]
-pub struct HttpClient {
+pub struct BitcoindRpcTransport {
     client: reqwest::Client,
-    url: Url,
+    address: Url,
     user: String,
     pass: String,
-    nonce: atomic::AtomicUsize,
 }
 
-impl HttpClient {
-    pub fn new(url: &str, user: &str, pass: &str) -> Result<HttpClient, Error> {
-        let parsed_url =
-            Url::parse(url).map_err(|parse_error| Error::Url(parse_error.to_string()))?;
-        Ok(HttpClient {
+impl BitcoindRpcTransport {
+    fn new(address: Url, user: &str, pass: &str) -> Self {
+        BitcoindRpcTransport {
             client: Client::new(),
-            url: parsed_url,
+            address,
             user: user.to_owned(),
             pass: pass.to_owned(),
-            nonce: atomic::AtomicUsize::new(1),
-        })
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct JsonRpcClient<T: Transport> {
+    nonce: atomic::AtomicUsize,
+    transport: T,
+}
+
+pub type BitcoindClient = JsonRpcClient<BitcoindRpcTransport>;
+
+#[allow(async_fn_in_trait)]
+pub trait Transport {
+    fn build(address: Url, user: &str, pass: &str) -> Self;
+    async fn send(&self, payload: RpcRequest) -> Result<RpcResponse, Error>;
+}
+
+impl Transport for BitcoindRpcTransport {
+    fn build(address: Url, user: &str, pass: &str) -> BitcoindRpcTransport {
+        BitcoindRpcTransport::new(address, user, pass)
     }
 
-    pub async fn call_method(
-        &self,
-        method: &str,
-        params: Option<Box<RawValue>>,
-    ) -> Result<RpcResponse, Error> {
-        let request_id = self.nonce.fetch_add(1, atomic::Ordering::Relaxed);
-        let request = RpcRequest {
-            jsonrpc: "2.0".to_owned(),
-            id: Some(request_id),
-            method: method.to_owned(),
-            params,
-        };
-
+    async fn send(&self, payload: RpcRequest) -> Result<RpcResponse, Error> {
         let http_response = self
             .client
-            .post(self.url.clone())
+            .post(self.address.clone())
             .basic_auth(self.user.clone(), Some(self.pass.clone()))
-            .json(&request)
+            .json(&payload)
             .header("content-type", "application/json")
             .send()
             .await?;
@@ -54,6 +58,7 @@ impl HttpClient {
             StatusCode::OK => {
                 let payload = http_response.json::<RpcResponse>().await?;
                 let expected_version = "2.0".to_owned();
+                let request_id = payload.id.clone().unwrap();
                 match (
                     payload
                         .id
@@ -89,5 +94,31 @@ impl HttpClient {
             // https://github.com/bitcoin/bitcoin/blob/d6b225f1652526cb053ec32c8ff09160d5a759c5/src/rpc/protocol.h#L10
             _ => Err(Error::Err("Unreachable from Bitcoind".to_owned())),
         }
+    }
+}
+
+impl<T: Transport> JsonRpcClient<T> {
+    pub fn new(address: &str, user: &str, pass: &str) -> Result<Self, Error> {
+        let parsed_address =
+            Url::parse(address).map_err(|parse_error| Error::Url(parse_error.to_string()))?;
+        Ok(JsonRpcClient {
+            nonce: atomic::AtomicUsize::new(1),
+            transport: T::build(parsed_address, user, pass),
+        })
+    }
+
+    pub fn create_method(&self, method: &str, params: Option<Box<RawValue>>) -> RpcRequest {
+        let request_id = self.nonce.fetch_add(1, atomic::Ordering::Relaxed);
+        RpcRequest::new(method, params, request_id)
+    }
+
+    pub async fn call_method(
+        &self,
+        method: &str,
+        params: Option<Box<RawValue>>,
+    ) -> Result<RpcResponse, Error> {
+        self.transport
+            .send(self.create_method(method, params))
+            .await
     }
 }
