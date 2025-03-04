@@ -1,11 +1,11 @@
 use reqwest::{Client, StatusCode, Url};
 use serde_json::value::RawValue;
-use std::sync::atomic;
+use std::sync::{atomic, Arc};
 
 use crate::error::*;
 use crate::json_rpc_types::*;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct BitcoindRpcTransport {
     client: reqwest::Client,
     address: Url,
@@ -24,9 +24,9 @@ impl BitcoindRpcTransport {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct JsonRpcClient<T: Transport> {
-    nonce: atomic::AtomicUsize,
+    nonce: Arc<atomic::AtomicUsize>,
     transport: T,
 }
 
@@ -102,7 +102,7 @@ impl<T: Transport> JsonRpcClient<T> {
         let parsed_address =
             Url::parse(address).map_err(|parse_error| Error::Url(parse_error.to_string()))?;
         Ok(JsonRpcClient {
-            nonce: atomic::AtomicUsize::new(1),
+            nonce: Arc::new(atomic::AtomicUsize::new(1)),
             transport: T::build(parsed_address, user, pass),
         })
     }

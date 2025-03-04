@@ -14,10 +14,11 @@ async fn main() -> Result<(), reqwest::Error> {
 
     match &cli.command {
         Commands::GetBlockchainInfo => {
-            let request = RpcRequest::new("testing", None, 0);
+            let request = RpcRequest::new("getblockchaininfo", None, 0);
             let response = roxyd_client.post(address).json(&request).send().await?;
 
             println!("{response:?}");
+            println!("{}", response.text().await.unwrap());
         }
     }
 

@@ -18,7 +18,6 @@ async fn proxy(
     // Consult the read payload and do some verification
     // Use username and password from file (read the file in main)
     // Check response from bitcoind to treat it back to roxy-cli
-
     let response = bitcoind_client
         .call_method(&json_rpc.method, json_rpc.params.clone())
         .await?;
@@ -28,11 +27,12 @@ async fn proxy(
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
+    std::env::set_var("RUST_LOG", "debug");
+    env_logger::init();
     // TODO: share resources (DB, username, password) with services
     // let args: Vec<String> = env::args().collect();
 
-    let bitcoind_client =
-        Arc::new(BitcoindClient::new("http://127.0.0.1:38332", "foo", "bar").unwrap());
+    let bitcoind_client = BitcoindClient::new("http://127.0.0.1:18443", "foo", "bar").unwrap();
 
     let _ = HttpServer::new(move || {
         App::new()

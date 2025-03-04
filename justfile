@@ -2,10 +2,6 @@
 default:
     just --list
 
-# Simulate Bitcoind
-bitcoind:
-    nc -l 38332
-
 # Run (with cargo) roxyd
 server:
 	cargo run -- roxyd
@@ -17,3 +13,7 @@ client:
 # Update Cargo.nix
 update-nix:
 	nix run github:cargo2nix/cargo2nix && rm -rf .direnv && direnv allow
+
+# Simulate Bitcoind
+bitcoind:
+	bitcoind -regtest -debug=rpc -rpcpassword=bar -rpcuser=foo
