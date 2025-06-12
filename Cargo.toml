@@ -1,5 +1,7 @@
 [package]
+authors = ["Edil Medeiros", "Eduardo Lemos"]
 name = "roxy"
+description = "Whatever you need is here"
 version = "0.1.0"
 edition = "2021"
 
