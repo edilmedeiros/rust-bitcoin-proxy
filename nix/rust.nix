@@ -8,11 +8,7 @@
     rust-project.crates."roxy".crane.args = {
       preBuild = config.hook;
       doCheck = false;
-      buildInputs = config.dependencies ++ lib.optionals pkgs.stdenv.isDarwin (
-        with pkgs.darwin.apple_sdk.frameworks; [
-          IOKit
-        ]
-      );
+      buildInputs = config.dependencies;
     };
     packages.default = self'.packages.roxy;
     apps = {
