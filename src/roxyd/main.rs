@@ -4,6 +4,8 @@ use roxy::http_client::HttpClient;
 // use std::env;
 use actix_web::{post, web, App, HttpResponse, HttpServer};
 use roxy::json_rpc::*;
+
+use std::process::exit;
 use std::sync::Arc;
 
 // TODO: share client between services
@@ -31,7 +33,40 @@ async fn main() -> Result<(), Error> {
     // TODO: share resources (DB, username, password) with services
     // let args: Vec<String> = env::args().collect();
 
-    let client = Arc::new(HttpClient::new("http://127.0.0.1:38332", "foo", "bar").unwrap());
+    // TODO: get cookie path via cli
+    let cookie_path = "datadir/regtest/.cookie";
+    let (user, pass) = match std::fs::read_to_string(cookie_path)
+        .map_err(|e| Error::from(e))
+        .and_then(|s| {
+            s.split_once(":")
+                .map(|(s1, s2)| (s1.to_string(), s2.to_string()))
+                .ok_or(Error::Err("Can't parse cookie file".to_string()))
+        }) {
+        Ok(t) => t,
+        Err(Error::IO(e)) => {
+            println!("{}: {}", cookie_path, e);
+            exit(-1);
+        }
+        Err(Error::Err(e)) => {
+            println!("{}", e);
+            exit(-1);
+        }
+        _ => {
+            println! {"Unexpected error..."};
+            exit(-1);
+        }
+    };
+
+    let client = Arc::new(HttpClient::new("http://127.0.0.1:38332", &user, &pass).unwrap());
+    match client.call_method("getblockchaininfo", None).await {
+        Ok(_) => println!("Connected to Bitcoin Core!"),
+        Err(e) => {
+            println!("Can't connect to Bitcoin Core: {}", e);
+            exit(-1);
+        }
+    }
+
+    // TODO: validate the connection to node.
 
     let _ = HttpServer::new(move || {
         App::new()
