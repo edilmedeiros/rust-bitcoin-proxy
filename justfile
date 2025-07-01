@@ -2,18 +2,30 @@
 default:
     just --list
 
+# Run Bitcoind
+bitcoind *ARGS:
+	bitcoind -regtest -datadir=datadir {{ARGS}}
+
+# Run Bitcoin-cli
+bcli *ARGS:
+	bitcoin-cli -regtest -datadir=datadir {{ARGS}}
+
 # Run (with cargo) roxyd
-server:
-	cargo run -- roxyd
+server *ARGS:
+	RUST_BACKTRACE=1 RUST_LOG=debug cargo run -- roxyd {{ARGS}}
 
 # Run (with cargo) roxy-cli
-client:
-	echo "Roxy-cli is yet not implemented"
+cli *ARGS:
+	RUST_BACKTRACE=1 RUST_LOG=debug cargo run -- roxy-cli {{ARGS}}
 
-# Update Cargo.nix
-update-nix:
-	nix run github:cargo2nix/cargo2nix && rm -rf .direnv && direnv allow
+# Run rust formatter
+format:
+	cargo fmt
 
-# Simulate Bitcoind
-bitcoind:
-	bitcoind -regtest -debug=rpc -rpcpassword=bar -rpcuser=foo
+# Run pre-commit hooks on all files, including autoformatting
+pre-commit-all:
+    pre-commit run --all-files
+
+# Run 'bacon' to run the project (auto-recompiles)
+watch *ARGS:
+	bacon --job run -- roxyd -- {{ ARGS }}
