@@ -15,11 +15,11 @@ bcli *ARGS:
 	bitcoin-cli -regtest -datadir=.datadir {{ARGS}}
 
 # Run (with cargo) roxyd
-server *ARGS:
+roxyd *ARGS:
 	RUST_BACKTRACE=1 RUST_LOG=debug cargo run --bin roxyd -- {{ARGS}}
 
 # Run (with cargo) roxy-cli
-cli *ARGS:
+roxy-cli *ARGS:
 	RUST_BACKTRACE=1 RUST_LOG=debug cargo run --bin roxy-cli -- {{ARGS}}
 
 # Run rust formatter
