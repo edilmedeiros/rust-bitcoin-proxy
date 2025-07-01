@@ -19,7 +19,7 @@ roxyd *ARGS:
 	RUST_BACKTRACE=1 RUST_LOG=debug cargo run --bin roxyd -- {{ARGS}}
 
 # Run (with cargo) roxy-cli
-roxy-cli *ARGS:
+rcli *ARGS:
 	RUST_BACKTRACE=1 RUST_LOG=debug cargo run --bin roxy-cli -- {{ARGS}}
 
 # Run rust formatter
