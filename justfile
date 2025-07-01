@@ -12,11 +12,11 @@ bcli *ARGS:
 
 # Run (with cargo) roxyd
 server *ARGS:
-	RUST_BACKTRACE=1 RUST_LOG=debug cargo run -- roxyd {{ARGS}}
+	RUST_BACKTRACE=1 RUST_LOG=debug cargo run --bin roxyd -- {{ARGS}}
 
 # Run (with cargo) roxy-cli
 cli *ARGS:
-	RUST_BACKTRACE=1 RUST_LOG=debug cargo run -- roxy-cli {{ARGS}}
+	RUST_BACKTRACE=1 RUST_LOG=debug cargo run --bin roxy-cli -- {{ARGS}}
 
 # Run rust formatter
 format:
