@@ -2,20 +2,25 @@
 default:
     just --list
 
-# Simulate Bitcoind
-bitcoind *ARGS:
-	bitcoind -regtest -datadir=datadir {{ARGS}}
+# Build all executables
+build:
+	nix build
 
+# Run Bitcoind
+bitcoind *ARGS:
+	bitcoind -regtest -datadir=.datadir {{ARGS}}
+
+# Run Bitcoin-cli
 bcli *ARGS:
-	bitcoin-cli -regtest -datadir=datadir {{ARGS}}
+	bitcoin-cli -regtest -datadir=.datadir {{ARGS}}
 
 # Run (with cargo) roxyd
-server *ARGS:
-	cargo run -- roxyd {{ARGS}}
+roxyd *ARGS:
+	RUST_BACKTRACE=1 RUST_LOG=debug cargo run --bin roxyd -- {{ARGS}}
 
 # Run (with cargo) roxy-cli
-cli *ARGS:
-	cargo run -- roxy-cli {{ARGS}}
+rcli *ARGS:
+	RUST_BACKTRACE=1 RUST_LOG=debug cargo run --bin roxy-cli -- {{ARGS}}
 
 # Run rust formatter
 format:

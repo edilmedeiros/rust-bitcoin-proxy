@@ -18,14 +18,12 @@ pub struct RpcRequest {
 }
 
 impl RpcRequest {
-    pub fn new(method: String) -> Self {
+    pub fn new(method: &str, params: Option<Box<RawValue>>, request_id: usize) -> Self {
         RpcRequest {
-            jsonrpc: "2.0".to_string(),
-            method,
-            // TODO: Improve this later
-            params: None,
-            // TODO: Improve this later
-            id: Some(1),
+            jsonrpc: "2.0".to_owned(),
+            id: Some(request_id),
+            method: method.to_owned(),
+            params,
         }
     }
 }

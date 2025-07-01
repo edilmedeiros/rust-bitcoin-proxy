@@ -1,22 +1,26 @@
-use roxy::json_rpc::*;
-use serde_json;
+mod cli;
+use clap::Parser;
+use cli::Cli;
+use cli::Commands;
+use reqwest;
+use roxy::json_rpc_types::*;
 
 #[tokio::main]
 async fn main() -> Result<(), reqwest::Error> {
-    let request = RpcRequest::new("getblockchaininfo".to_string());
-    let string = serde_json::to_string(&request).unwrap();
-    let ret: RpcRequest = serde_json::from_str(&string).unwrap();
-    println!("{:?}", ret);
+    let cli = Cli::parse();
 
-    let client = reqwest::Client::new();
-    let response = client
-        .post("http://127.0.0.1:8080/proxy")
-        .json(&request)
-        .send()
-        .await?;
+    let roxyd_client = reqwest::Client::new();
+    let address = "http://127.0.0.1:8080/proxy";
 
-    println!("{response:?}");
-    println!("{:?}", response.text().await?);
+    match &cli.command {
+        Commands::GetBlockchainInfo => {
+            let request = RpcRequest::new("getblockchaininfo", None, 0);
+            let response = roxyd_client.post(address).json(&request).send().await?;
+
+            println!("{response:?}");
+            println!("{}", response.text().await.unwrap());
+        }
+    }
 
     Ok(())
 }
