@@ -1,26 +1,33 @@
 use clap::{Parser, ValueEnum};
+use std::fmt;
+use std::fmt::{Display, Formatter};
 
 #[derive(Parser, ValueEnum, Debug, Clone)]
 pub enum Network {
-    Mainet,
+    #[clap(name = "mainnet")]
+    Mainnet,
+    #[clap(name = "testnet")]
     Testnet,
+    #[clap(name = "regtest")]
     Regtest,
+    #[clap(name = "signet")]
     Signet,
 }
 
-impl ToString for Network {
-    fn to_string(&self) -> String {
-        match self {
-            Network::Mainet => "mainet".to_string(),
+impl Display for Network {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        let something = match self {
+            Network::Mainnet => "mainnet".to_string(),
             Network::Testnet => "testnet".to_string(),
             Network::Regtest => "regtest".to_string(),
             Network::Signet => "signet".to_string(),
-        }
+        };
+        write!(f, "{}", something)
     }
 }
 
-const DEFAULT_ADDRESS: &'static str = "localhost";
-const DEFAULT_DATADIR: &'static str = ".datadir";
+const DEFAULT_ADDRESS: &str = "localhost";
+const DEFAULT_DATADIR: &str = ".datadir";
 
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
@@ -30,7 +37,7 @@ pub struct Args {
     pub datadir: String,
 
     /// Network    
-    #[arg(short, long, value_name = "NET", default_value_t = Network::Mainet)]
+    #[arg(short, long, value_name = "NET", default_value_t = Network::Mainnet)]
     pub network: Network,
 
     /// RPC Port

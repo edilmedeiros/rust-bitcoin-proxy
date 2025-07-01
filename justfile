@@ -6,6 +6,9 @@ default:
 build:
 	nix build
 
+clippy:
+	cargo clippy
+
 # Run Bitcoind
 bitcoind *ARGS:
 	bitcoind -regtest -datadir=.datadir {{ARGS}}
@@ -16,11 +19,11 @@ bcli *ARGS:
 
 # Run (with cargo) roxyd
 roxyd *ARGS:
-	RUST_BACKTRACE=1 RUST_LOG=debug cargo run --bin roxyd -- {{ARGS}} -d
+	RUST_BACKTRACE=1 RUST_LOG=debug cargo run --bin roxyd -- {{ARGS}} -d --network=regtest
 
 # Run (with cargo) roxy-cli
 rcli *ARGS:
-	RUST_BACKTRACE=1 RUST_LOG=debug cargo run --bin roxy-cli -- {{ARGS}} -d
+	RUST_BACKTRACE=1 RUST_LOG=debug cargo run --bin roxy-cli -- {{ARGS}}
 
 # Run rust formatter
 format:
