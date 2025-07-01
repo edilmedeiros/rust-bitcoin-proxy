@@ -1,3 +1,6 @@
+mod cli;
+use clap::Parser;
+use cli::{Args, Network};
 use roxy::error::*;
 use roxy::json_rpc_client::BitcoindClient;
 // use serde_json::value::RawValue;
@@ -27,9 +30,10 @@ async fn proxy(
     Ok(HttpResponse::Ok().body(serde_json::to_string(&response.clone()).unwrap()))
 }
 
-fn login_with_cookie() -> (String, String) {
-    let cookie_path = ".datadir/regtest/.cookie";
-    let (user, pass) = match std::fs::read_to_string(cookie_path)
+fn login_with_cookie(datadir_path: &str) -> (String, String) {
+    let mut full_path: String = "/regtest/.cookie".to_owned();
+    full_path.insert_str(0, datadir_path);
+    let (user, pass) = match std::fs::read_to_string(&full_path)
         .map_err(|e| Error::from(e))
         .and_then(|s| {
             s.split_once(":")
@@ -40,7 +44,7 @@ fn login_with_cookie() -> (String, String) {
         Err(Error::IO(e)) => {
             println!(
                 "{}: {} (Make sure you are running the bitcoin node)",
-                cookie_path, e
+                full_path, e
             );
             exit(-1);
         }
@@ -56,16 +60,32 @@ fn login_with_cookie() -> (String, String) {
     (user, pass)
 }
 
+fn get_rpc_port(cli: &Args) -> u16 {
+    match cli.rpc_port {
+        None => match cli.network {
+            Network::Mainet => 8332,
+            Network::Regtest => 18443,
+            Network::Testnet => 38332,
+            Network::Signet => 38332,
+        },
+        Some(port) => port,
+    }
+}
+
 #[tokio::main]
 async fn main() -> Result<(), Error> {
-    env_logger::init();
+    let cli = Args::parse();
+    if cli.debug {
+        env_logger::init();
+    }
     // TODO: share resources (DB, username, password) with services
     // let args: Vec<String> = env::args().collect();
 
     // TODO: get cookie path via cli
-    let (user, pass) = login_with_cookie();
+    let (user, pass) = login_with_cookie(&cli.datadir);
 
-    let client = Arc::new(BitcoindClient::new("http://127.0.0.1:18443", &user, &pass).unwrap());
+    let client =
+        Arc::new(BitcoindClient::new(&cli.rpc_addr, get_rpc_port(&cli), &user, &pass).unwrap());
     match client.call_method("getblockchaininfo", None).await {
         Ok(_) => println!("Connected to Bitcoin Core!"),
         Err(e) => {
@@ -79,7 +99,7 @@ async fn main() -> Result<(), Error> {
             .app_data(web::Data::from(client.clone()))
             .service(proxy)
     })
-    .bind(("127.0.0.1", 8080))?
+    .bind((cli.roxy_bind, cli.roxy_port))?
     .run()
     .await;
 
