@@ -34,7 +34,7 @@ fn login_with_cookie(datadir_path: &str) -> (String, String) {
     let mut full_path: String = "/regtest/.cookie".to_owned();
     full_path.insert_str(0, datadir_path);
     let (user, pass) = match std::fs::read_to_string(&full_path)
-        .map_err(|e| Error::from(e))
+        .map_err(Error::from)
         .and_then(|s| {
             s.split_once(":")
                 .map(|(s1, s2)| (s1.to_string(), s2.to_string()))
@@ -63,7 +63,7 @@ fn login_with_cookie(datadir_path: &str) -> (String, String) {
 fn get_rpc_port(cli: &Args) -> u16 {
     match cli.rpc_port {
         None => match cli.network {
-            Network::Mainet => 8332,
+            Network::Mainnet => 8332,
             Network::Regtest => 18443,
             Network::Testnet => 38332,
             Network::Signet => 38332,
