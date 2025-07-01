@@ -33,27 +33,27 @@ const DEFAULT_DATADIR: &str = ".datadir";
 #[command(version, about, long_about = None)]
 pub struct Args {
     /// Path to datadir directory
-    #[arg(long, value_name = "DIR", default_value = DEFAULT_DATADIR)]
+    #[arg(long, value_name = "dir", default_value = DEFAULT_DATADIR)]
     pub datadir: String,
 
     /// Network    
-    #[arg(short, long, value_name = "NET", default_value_t = Network::Mainnet)]
+    #[arg(short, long, value_name = "net", default_value_t = Network::Mainnet)]
     pub network: Network,
 
     /// RPC Port
-    #[arg(long, value_name = "PORT")]
+    #[arg(long, value_name = "port")]
     pub rpc_port: Option<u16>,
 
     /// RPC Address
-    #[arg(long, value_name = "IP", default_value = DEFAULT_ADDRESS)]
+    #[arg(long, value_name = "ip", default_value = DEFAULT_ADDRESS)]
     pub rpc_addr: String,
 
     /// Roxyd Port
-    #[arg(long, value_name = "PORT", default_value_t = 8080)]
+    #[arg(long, value_name = "port", default_value_t = 8080)]
     pub roxy_port: u16,
 
     /// Roxyd Bind
-    #[arg(long, value_name = "IP", default_value = DEFAULT_ADDRESS)]
+    #[arg(long, value_name = "ip", default_value = DEFAULT_ADDRESS)]
     pub roxy_bind: String,
 
     /// Debug
