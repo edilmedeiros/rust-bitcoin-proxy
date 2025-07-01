@@ -28,7 +28,7 @@ async fn proxy(
 }
 
 fn login_with_cookie() -> (String, String) {
-    let cookie_path = "datadir/regtest/.cookie";
+    let cookie_path = ".datadir/regtest/.cookie";
     let (user, pass) = match std::fs::read_to_string(cookie_path)
         .map_err(|e| Error::from(e))
         .and_then(|s| {
