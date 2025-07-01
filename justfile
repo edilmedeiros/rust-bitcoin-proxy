@@ -4,11 +4,11 @@ default:
 
 # Run Bitcoind
 bitcoind *ARGS:
-	bitcoind -regtest -datadir=datadir {{ARGS}}
+	bitcoind -regtest -datadir=.datadir {{ARGS}}
 
 # Run Bitcoin-cli
 bcli *ARGS:
-	bitcoin-cli -regtest -datadir=datadir {{ARGS}}
+	bitcoin-cli -regtest -datadir=.datadir {{ARGS}}
 
 # Run (with cargo) roxyd
 server *ARGS:
