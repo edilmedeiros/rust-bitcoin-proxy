@@ -98,9 +98,10 @@ impl Transport for BitcoindRpcTransport {
 }
 
 impl<T: Transport> JsonRpcClient<T> {
-    pub fn new(address: &str, user: &str, pass: &str) -> Result<Self, Error> {
+    pub fn new(rpc_addr: &str, rpc_port: u16, user: &str, pass: &str) -> Result<Self, Error> {
+        let full_addr = String::from_iter(["http://", rpc_addr, ":", &rpc_port.to_string()]);
         let parsed_address =
-            Url::parse(address).map_err(|parse_error| Error::Url(parse_error.to_string()))?;
+            Url::parse(&full_addr).map_err(|parse_error| Error::Url(parse_error.to_string()))?;
         Ok(JsonRpcClient {
             nonce: Arc::new(atomic::AtomicUsize::new(1)),
             transport: T::build(parsed_address, user, pass),
