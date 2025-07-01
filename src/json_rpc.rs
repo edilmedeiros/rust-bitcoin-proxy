@@ -17,6 +17,19 @@ pub struct RpcRequest {
     pub id: Option<usize>,
 }
 
+impl RpcRequest {
+    pub fn new(method: String) -> Self {
+        RpcRequest {
+            jsonrpc: "2.0".to_string(),
+            method,
+            // TODO: Improve this later
+            params: None,
+            // TODO: Improve this later
+            id: Some(1),
+        }
+    }
+}
+
 /// A JSONRPC response object.
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct RpcResponse {
