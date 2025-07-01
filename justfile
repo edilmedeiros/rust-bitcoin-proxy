@@ -2,6 +2,10 @@
 default:
     just --list
 
+# Build all executables
+build:
+	nix build
+
 # Run Bitcoind
 bitcoind *ARGS:
 	bitcoind -regtest -datadir=.datadir {{ARGS}}
