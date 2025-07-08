@@ -2,7 +2,7 @@ mod cli;
 use clap::Parser;
 use cli::Cli;
 use cli::Commands;
-use roxy::json_rpc_types::*;
+use roxy::rpc::types::*;
 
 #[tokio::main]
 async fn main() -> Result<(), reqwest::Error> {

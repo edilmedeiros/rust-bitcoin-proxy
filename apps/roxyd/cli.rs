@@ -1,4 +1,4 @@
-use clap::{Parser, ValueEnum};
+use clap::{Parser, Subcommand, ValueEnum};
 use std::fmt;
 use std::fmt::{Display, Formatter};
 
@@ -26,6 +26,17 @@ impl Display for Network {
     }
 }
 
+#[derive(Debug, Clone, Subcommand)]
+#[command(arg_required_else_help = true)]
+pub enum Action {
+    /// Start proxy to bitcoind node
+    #[clap(name = "proxy")]
+    Proxy,
+    /// Test connection to bitcoind RPC
+    #[clap(name = "test")]
+    Test,
+}
+
 const DEFAULT_ADDRESS: &str = "localhost";
 const DEFAULT_DATADIR: &str = ".datadir";
 
@@ -35,6 +46,10 @@ pub struct Args {
     /// Path to datadir directory
     #[arg(long, value_name = "dir", default_value = DEFAULT_DATADIR)]
     pub datadir: String,
+
+    /// Action
+    #[command(subcommand)]
+    pub action: Action,
 
     /// Network    
     #[arg(short, long, value_name = "net", default_value_t = Network::Mainnet)]
