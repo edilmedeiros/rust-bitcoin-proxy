@@ -1,17 +1,22 @@
 [package]
 authors = ["Edil Medeiros", "Eduardo Lemos"]
 name = "roxy"
-description = "Whatever you need is here"
+description = "Bitcoin node proxy and CLI in Rust"
 version = "0.1.0"
 edition = "2021"
 
 [[bin]]
-path = "src/roxyd/main.rs"
+path = "apps/roxyd/main.rs"
 name = "roxyd"
 
 [[bin]]
-path = "src/roxy-cli/main.rs"
+path = "apps/roxy-cli/main.rs"
 name = "roxy-cli"
+
+[lib]
+name = "roxy"          
+path = "lib/lib.rs"    
+crate-type = ["lib"]   
 
 [dependencies]
 actix-web = "4.9.0"
