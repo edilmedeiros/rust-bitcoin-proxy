@@ -2,8 +2,8 @@ use reqwest::{Client, StatusCode, Url};
 use serde_json::value::RawValue;
 use std::sync::{atomic, Arc};
 
+use super::types::*;
 use crate::error::*;
-use crate::json_rpc_types::*;
 
 #[derive(Debug, Clone)]
 pub struct BitcoindRpcTransport {
@@ -44,6 +44,7 @@ impl Transport for BitcoindRpcTransport {
     }
 
     async fn send(&self, payload: RpcRequest) -> Result<RpcResponse, Error> {
+        // TODO: This is not failing properly when the network is closed
         let http_response = self
             .client
             .post(self.address.clone())
