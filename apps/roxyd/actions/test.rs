@@ -13,7 +13,7 @@ pub async fn run(cli: &Args) -> Result<Arc<JsonRpcClient<BitcoindRpcTransport>>,
 
     // TODO: Timeout could not connect and report to the user
     match client.call_method("getblockchaininfo", None).await {
-        Ok(_) => println!("Pinged to Bitcoin Core!"),
+        Ok(_) => println!("Pinged Bitcoin Core!"),
         Err(e) => {
             println!("Can't connect to Bitcoin Core: {}", e);
             exit(-1);

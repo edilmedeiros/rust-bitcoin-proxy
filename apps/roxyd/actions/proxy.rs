@@ -8,10 +8,10 @@ pub async fn run(cli: &Args) -> Result<(), Error> {
     if cli.debug {
         env_logger::init();
     }
+    // TODO: get cookie path via cli
     // TODO: share resources (DB, username, password) with services
     // let args: Vec<String> = env::args().collect();
 
-    // TODO: get cookie path via cli
     let client = test::run(cli).await?;
 
     let _ = HttpServer::new(move || {
