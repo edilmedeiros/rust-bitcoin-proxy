@@ -9,6 +9,7 @@
       ] ++ config.dependencies;
       shellHook = config.hook;
       packages = with pkgs; [
+        curl
         just
         nixd
         bacon
