@@ -16,18 +16,19 @@ name = "roxy-cli"
 [lib]
 name = "roxy"          
 path = "lib/lib.rs"    
-crate-type = ["lib"]   
+crate-type = ["lib"]
 
 [dependencies]
-actix-web = "4.9.0"
-env_logger = "0.10.0"
+actix-web = { version = "4.9.0", features = ["openssl"] }
 clap = {version = "4.1.8", features = ["derive", "cargo"]}
+env_logger = "0.10.0"
+home = "=0.5.9"
+native-tls = "0.2.14"
+node = { package = "corepc-node", version = "0.4.0", features = ["28_0"] }
+openssl = { version = "0.10" }
 reqwest = { version = "0.12.9", features = ["json"] }
 serde = { version = "1.0.215", features = ["derive"] }
 serde_json = { version = "1.0.133", features = ["raw_value"] }
 tokio = { version = "1.41.1", features = ["full"] }
-# Pin which and home crates because of some weird behavior when running via Nix
-# Which and Home crates are indirect dependencies for corepc-node
 which = "=4.2.5"
-home = "=0.5.9"
-node = { package = "corepc-node", version = "0.4.0", features = ["28_0"] }
+
