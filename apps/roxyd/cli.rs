@@ -44,31 +44,31 @@ const DEFAULT_DATADIR: &str = ".datadir";
 #[command(version, about, long_about = None)]
 pub struct Args {
     /// Path to datadir directory
-    #[arg(long, value_name = "dir", default_value = DEFAULT_DATADIR)]
+    #[arg(long, value_name = "dir", env = "ROXYD_DATADIR", default_value = DEFAULT_DATADIR)]
     pub datadir: String,
 
     /// Action
     #[command(subcommand)]
     pub action: Action,
 
-    /// Network    
-    #[arg(short, long, value_name = "net", default_value_t = Network::Mainnet)]
+    /// Network
+    #[arg(short, long, value_name = "net", env = "ROXYD_NETWORK", default_value_t = Network::Mainnet)]
     pub network: Network,
 
     /// RPC Port
-    #[arg(long, value_name = "port")]
+    #[arg(long, env = "ROXYD_RPC_PORT", value_name = "port")]
     pub rpc_port: Option<u16>,
 
     /// RPC Address
-    #[arg(long, value_name = "ip", default_value = DEFAULT_ADDRESS)]
+    #[arg(long, value_name = "ip", env = "ROXYD_RPC_ADDR", default_value = DEFAULT_ADDRESS)]
     pub rpc_addr: String,
 
     /// Roxyd Port
-    #[arg(long, value_name = "port", default_value_t = 8080)]
+    #[arg(long, value_name = "port", env = "ROXYD_PORT", default_value_t = 8080)]
     pub roxy_port: u16,
 
     /// Roxyd Bind
-    #[arg(long, value_name = "ip", default_value = DEFAULT_ADDRESS)]
+    #[arg(long, value_name = "ip", env = "ROXYD_BIND", default_value = DEFAULT_ADDRESS)]
     pub roxy_bind: String,
 
     /// Debug
@@ -76,6 +76,6 @@ pub struct Args {
     pub debug: bool,
 
     /// Roxyd Daemon
-    #[arg(short = 'b', long, default_value_t = false)]
+    #[arg(short = 'b', long, env = "ROXYD_DAEMON", default_value_t = false)]
     pub daemon: bool,
 }
