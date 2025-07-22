@@ -20,3 +20,7 @@ target/
 /result
 /result-lib
 /.pre-commit-config.yaml
+
+# Ignore TLS certificates
+certs/*
+**/*.pem
