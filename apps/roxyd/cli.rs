@@ -1,6 +1,7 @@
 use clap::{Parser, Subcommand, ValueEnum};
 use std::fmt;
 use std::fmt::{Display, Formatter};
+use std::path::PathBuf;
 
 #[derive(Parser, ValueEnum, Debug, Clone)]
 pub enum Network {
@@ -39,6 +40,8 @@ pub enum Action {
 
 const DEFAULT_ADDRESS: &str = "localhost";
 const DEFAULT_DATADIR: &str = ".datadir";
+const DEFAULT_TLS_CERT_PATH: &str = "certs/cert.pem";
+const DEFAULT_TLS_KEY_PATH: &str = "certs/key.pem";
 
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
@@ -78,4 +81,12 @@ pub struct Args {
     /// Roxyd Daemon
     #[arg(short = 'b', long, env = "ROXYD_DAEMON", default_value_t = false)]
     pub daemon: bool,
+
+    /// TLS certificate file path
+    #[arg(long, env = "ROXYD_TLS_CERT_PATH", default_value = DEFAULT_TLS_CERT_PATH)]
+    pub tls_cert_path: PathBuf,
+
+    /// TLS key file path
+    #[arg(long, env = "ROXYD_TLS_KEY_PATH", default_value = DEFAULT_TLS_KEY_PATH)]
+    pub tls_key_path: PathBuf,
 }

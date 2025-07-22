@@ -17,10 +17,10 @@ pub async fn run(cli: &Args) -> Result<(), Error> {
 
     let mut builder = SslAcceptor::mozilla_intermediate(SslMethod::tls()).unwrap();
     builder
-        .set_private_key_file("config/key.pem", SslFiletype::PEM)
+        .set_private_key_file(&cli.tls_key_path, SslFiletype::PEM)
         .unwrap();
     builder
-        .set_certificate_chain_file("config/cert.pem")
+        .set_certificate_chain_file(&cli.tls_cert_path)
         .unwrap();
 
     let bind = String::from_iter([&cli.roxy_bind.clone(), ":", &cli.roxy_port.to_string()]);
