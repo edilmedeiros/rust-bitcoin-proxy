@@ -11,7 +11,7 @@ async fn main() -> Result<(), reqwest::Error> {
     let cli = Cli::parse();
 
     let mut buf = Vec::new();
-    File::open("config/cert.pem")
+    File::open(cli.tls_cert_path)
         .unwrap()
         .read_to_end(&mut buf)
         .unwrap();
