@@ -1,4 +1,4 @@
-# Lists all available targets
+# Lists all available recipes
 default:
     just --list
 

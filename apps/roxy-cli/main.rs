@@ -15,6 +15,7 @@ async fn main() -> Result<(), reqwest::Error> {
         .unwrap()
         .read_to_end(&mut buf)
         .unwrap();
+
     let cert = reqwest::Certificate::from_pem(&buf)?;
 
     let roxyd_client = reqwest::Client::builder()
